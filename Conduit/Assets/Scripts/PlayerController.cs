@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour {
 		playerPhysics = GetComponent<Rigidbody>();
 	}
 	
-	void FixedUpdate () {
+	void Update () {
 		ProcessPlayerInput();
 	}
 	
@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour {
 		//Vector3 moveAxis = transform.right * inputAxis.x + transform.forward * inputAxis.z;
 		if(inputAxis != Vector3.zero){
 			playerPhysics.MoveRotation(Quaternion.LookRotation(inputAxis, Vector3.up));
-			playerPhysics.MovePosition(transform.position + inputAxis * Time.fixedDeltaTime * (isShifted ? slowSpeed: speed));
+			playerPhysics.MovePosition(transform.position + inputAxis * Time.deltaTime * (isShifted ? slowSpeed: speed));
 		}
 	}
 	

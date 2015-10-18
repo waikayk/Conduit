@@ -81,17 +81,17 @@ public class Block : MonoBehaviour {
 	
 	public virtual void OnCollisionEnter(Collision other){
 		if(other.transform.tag == "Player"){
-			blockPhysics.mass = 2f;
+			blockPhysics.mass = 100f;
 		}
-		else if (other.transform.tag == "Block"){
-			blockPhysics.mass = 1000f;
-			blockPhysics.Sleep();
-		}
+//		else if (other.transform.tag == "Block"){
+//			blockPhysics.mass = 1000f;
+//			blockPhysics.Sleep();
+//		}
 	}
 	
 	public virtual void OnCollisionExit(Collision other){
 		if(other.transform.tag == "Player"){
-			blockPhysics.mass = 1000f;
+			blockPhysics.mass = 2000f;
 		}
 	}
 	
