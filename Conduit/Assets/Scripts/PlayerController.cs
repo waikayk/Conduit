@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour {
 	public float normalSpeed = 5f;
 	public float fastSpeed = 15f;
 	public float lookSpeed = 7f;
+	public GameObject attachmentIndicator;
 	
 	private Rigidbody playerPhysics;
 	private Coroutine currentRoutine;
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviour {
 	
 	void Start () {
 		playerPhysics = GetComponent<Rigidbody>();
+		attachmentIndicator.SetActive(false);
 		
 		currentRoutine = StartCoroutine(ProcessPlayerMovement());
 	}
@@ -40,11 +42,12 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	IEnumerator ProcessBlockMovement(){
+		yield return new WaitForSeconds(0.1f);
 		while(true){
 			Vector3 inputAxis = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
 			bool isShifted = Input.GetButton("Boost");
 			
-			if(inputAxis != Vector3.zero && OrthoCheck(inputAxis)){
+			if(inputAxis != Vector3.zero && CanMoveInDirection(inputAxis)){
 				StartCoroutine(Move(inputAxis, isShifted ? fastSpeed : normalSpeed));
 				yield return StartCoroutine(
 					touchingBlock.Move(inputAxis, isShifted? fastSpeed : normalSpeed)
@@ -58,42 +61,51 @@ public class PlayerController : MonoBehaviour {
 		if(touchingBlock == null) return;
 		
 		isAttached = true;
+		attachmentIndicator.SetActive(true);
 
 		StopCoroutine(currentRoutine);
 		
-		playerPhysics.interpolation = RigidbodyInterpolation.Interpolate;
-		touchingBlock.blockPhysics.interpolation = RigidbodyInterpolation.Interpolate;
-		touchingBlock.blockPhysics.isKinematic = false;
-		
-		//Attach
-		//fixedJoint = gameObject.AddComponent<FixedJoint>();
-		//fixedJoint.connectedBody = touchingBlock.blockPhysics;
+		GetComponent<Collider>().enabled = false;
+		playerPhysics.isKinematic = true;
+		touchingBlock.gameObject.GetComponent<Collider>().enabled = false;
 		
 		currentRoutine = StartCoroutine(ProcessBlockMovement());	
 	}
 	
 	public void Detach(){
 		isAttached = false;
+		attachmentIndicator.SetActive(false);
 		
 		StopCoroutine(currentRoutine);
 		
-		playerPhysics.interpolation = RigidbodyInterpolation.Interpolate;
+		GetComponent<Collider>().enabled = true;
+		playerPhysics.isKinematic = false;
+
+		touchingBlock.gameObject.GetComponent<Collider>().enabled = true;
 		touchingBlock.blockPhysics.isKinematic = true;
-		
-		//Detach
-		//Destroy(fixedJoint);
 		
 		currentRoutine = StartCoroutine(ProcessPlayerMovement());
 	}
 	
-	private bool OrthoCheck(Vector3 input){
+	private bool CanMoveInDirection(Vector3 input){
 		//if the dot product of input and a direction is equal to 1 or -1, it lies on the same axis
-		float a = Mathf.Abs(Vector3.Dot(Vector3.forward, input));
-		float b = Mathf.Abs(Vector3.Dot(Vector3.right, input));
-		if(Mathf.Approximately(a, 1f) || Mathf.Approximately(b, 1f))
-			return true;
-		else
-			return false;
+		float dot = Vector3.Dot(transform.forward, input);
+		
+		//Direction Check: Does it lie on the same axis as forward?
+		if(Mathf.Abs(dot) < 0.99f) return false;
+		
+		//Racycast Check: Is there room in front or behind?
+		
+		if(Mathf.Sign(dot) > 0){
+			//Forward
+			Ray ray = new Ray(touchingBlock.transform.position, input);
+			return !Physics.Raycast(ray, 1.25f);
+		}
+		else {
+			//Back
+			Ray ray = new Ray(transform.position, input);
+			return !Physics.Raycast(ray, 0.7f);
+		}
 	}
 	
 	private IEnumerator Move(Vector3 adjustment, float speed){
@@ -105,7 +117,7 @@ public class PlayerController : MonoBehaviour {
 				Vector3.Lerp(moveFrom, moveTo, t)
 			);
 			yield return new WaitForEndOfFrame();
-			t += Time.deltaTime * speed;
+			t += Time.deltaTime * speed/2f;
 		}
 		playerPhysics.MovePosition(moveTo);
 	}
@@ -115,7 +127,6 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	void OnCollisionStay(Collision other){
-		if(isAttached) return;
 		//For smooth looking movements
 		if(other.transform.tag == "Block" || other.transform.tag == "Immovable"){
 			playerPhysics.interpolation = RigidbodyInterpolation.None;
@@ -123,7 +134,6 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	void OnCollisionExit(Collision other){
-		if(isAttached) return;
 		if(other.transform.tag == "Block" || other.transform.tag == "Immovable"){
 			playerPhysics.interpolation = RigidbodyInterpolation.Interpolate;
 		}

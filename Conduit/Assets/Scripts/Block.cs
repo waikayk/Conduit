@@ -51,7 +51,7 @@ public class Block : MonoBehaviour {
 				Vector3.Lerp(moveFrom, moveTo, t)
 			);
 			yield return new WaitForEndOfFrame();
-			t += Time.deltaTime * speed;
+			t += Time.deltaTime * speed/2f;
 		}
 		blockPhysics.MovePosition(moveTo);
 	}
