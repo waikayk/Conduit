@@ -11,8 +11,6 @@ public class Block : MonoBehaviour {
 	public Dictionary<int, Block> connectedBlocks{get;set;}
 	public bool isPulsing {get;set;}
 	
-	//private Vector3 moveTo = Vector3.zero;
-	
 	public virtual void Start(){
 		connectedBlocks = new Dictionary<int, Block>();
 		render = GetComponent<Renderer>();
@@ -21,13 +19,6 @@ public class Block : MonoBehaviour {
 		
 		render.material = offMat;
 	}
-	
-//	public virtual void FixedUpdate(){
-//		if(moveTo != Vector3.zero){
-//			blockPhysics.MovePosition(transform.position + moveTo);
-//			moveTo = Vector3.zero;
-//		}
-//	}
 	
 	public void PulsePower(int sourceID, WaitForSeconds rate){
 		if(isPulsing) return;
@@ -51,6 +42,20 @@ public class Block : MonoBehaviour {
 		isPulsing = false;
 	}
 	
+	public IEnumerator Move(Vector3 adjustment, float speed = 1f){
+		float t = 0;
+		Vector3 moveFrom = transform.position;
+		Vector3 moveTo = transform.position + adjustment;
+		while(t < 1f){
+			blockPhysics.MovePosition(
+				Vector3.Lerp(moveFrom, moveTo, t)
+			);
+			yield return new WaitForEndOfFrame();
+			t += Time.deltaTime * speed;
+		}
+		blockPhysics.MovePosition(moveTo);
+	}
+	
 	public virtual void OnTriggerEnter(Collider other){
 		if(other.gameObject.tag != "Connection") return;
 		int otherID = other.gameObject.GetInstanceID();
@@ -66,42 +71,5 @@ public class Block : MonoBehaviour {
 		if(connectedBlocks.ContainsKey(otherID)){
 			connectedBlocks.Remove(otherID);
 		}
-	}
-	
-//	public virtual void OnCollisionStay(Collision other){
-//		if(other.gameObject.tag == "Player" && OrthoCheck(other.transform.forward)){
-//			moveTo = other.transform.forward;
-//			//blockPhysics.MovePosition(transform.position + other.transform.forward * Time.deltaTime);
-//		}
-//		if(other.gameObject.tag == "Block"){
-//			moveTo = Vector3.zero;
-//		}
-//	}
-	
-	
-	public virtual void OnCollisionEnter(Collision other){
-		if(other.transform.tag == "Player"){
-			blockPhysics.mass = 100f;
-		}
-//		else if (other.transform.tag == "Block"){
-//			blockPhysics.mass = 1000f;
-//			blockPhysics.Sleep();
-//		}
-	}
-	
-	public virtual void OnCollisionExit(Collision other){
-		if(other.transform.tag == "Player"){
-			blockPhysics.mass = 2000f;
-		}
-	}
-	
-	private bool OrthoCheck(Vector3 input){
-		//if the dot product of input and a direction is equal to 1 or -1, it lies on the same axis
-		float a = Mathf.Abs(Vector3.Dot(Vector3.forward, input));
-		float b = Mathf.Abs(Vector3.Dot(Vector3.right, input));
-		if(Mathf.Approximately(a, 1f) || Mathf.Approximately(b, 1f))
-			return true;
-		else
-			return false;
 	}
 }
