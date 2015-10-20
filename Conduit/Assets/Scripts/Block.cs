@@ -3,21 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Block : MonoBehaviour {
+	public Renderer renderComponent;
+	public Collider blockCollider;
 	public Material onMat;
 	public Material offMat;
 	
-	public Renderer render{get; set;}
 	public Rigidbody blockPhysics{get; set;}
 	public Dictionary<int, Block> connectedBlocks{get;set;}
 	public bool isPulsing {get;set;}
 	
 	public virtual void Start(){
 		connectedBlocks = new Dictionary<int, Block>();
-		render = GetComponent<Renderer>();
 		blockPhysics = GetComponent<Rigidbody>();
 		isPulsing = false;
 		
-		render.material = offMat;
+		renderComponent.material = offMat;
 	}
 	
 	public void PulsePower(int sourceID, WaitForSeconds rate){
@@ -34,10 +34,10 @@ public class Block : MonoBehaviour {
 			element.Value.PulsePower(gameObject.GetInstanceID(), rate);
 		}
 		
-		render.material = onMat;
+		renderComponent.material = onMat;
 		yield return rate;
 		
-		render.material = offMat;
+		renderComponent.material = offMat;
 		yield return rate;
 		isPulsing = false;
 	}
@@ -46,6 +46,7 @@ public class Block : MonoBehaviour {
 		float t = 0;
 		Vector3 moveFrom = transform.position;
 		Vector3 moveTo = transform.position + adjustment;
+		moveTo = new Vector3(Mathf.Round(moveTo.x), moveTo.y, Mathf.Round(moveTo.z));
 		while(t < 1f){
 			blockPhysics.MovePosition(
 				Vector3.Lerp(moveFrom, moveTo, t)
@@ -54,22 +55,5 @@ public class Block : MonoBehaviour {
 			t += Time.deltaTime * speed/2f;
 		}
 		blockPhysics.MovePosition(moveTo);
-	}
-	
-	public virtual void OnTriggerEnter(Collider other){
-		if(other.gameObject.tag != "Connection") return;
-		int otherID = other.gameObject.GetInstanceID();
-		if(!connectedBlocks.ContainsKey(otherID)){
-			connectedBlocks.Add(otherID, other.attachedRigidbody.GetComponent<Block>());
-		}
-		
-	}
-	
-	public virtual void OnTriggerExit(Collider other){
-		if(other.gameObject.tag != "Connection") return;
-		int otherID = other.gameObject.GetInstanceID();
-		if(connectedBlocks.ContainsKey(otherID)){
-			connectedBlocks.Remove(otherID);
-		}
 	}
 }

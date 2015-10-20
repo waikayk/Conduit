@@ -2,27 +2,29 @@
 using System.Collections;
 
 public class PlayerController : MonoBehaviour {
+	public Collider playerCollider;
 	public float normalSpeed = 5f;
 	public float fastSpeed = 15f;
 	public float lookSpeed = 7f;
 	public GameObject attachmentIndicator;
+	public GameObject canAttachIndicator;
 	
 	private Rigidbody playerPhysics;
 	private Coroutine currentRoutine;
 	private bool isAttached = false;
 	
 	private Block touchingBlock;
-	private FixedJoint fixedJoint;
 	
 	void Start () {
 		playerPhysics = GetComponent<Rigidbody>();
 		attachmentIndicator.SetActive(false);
+		canAttachIndicator.SetActive(false);
 		
 		currentRoutine = StartCoroutine(ProcessPlayerMovement());
 	}
 	
 	void Update(){
-		if(Input.GetMouseButtonDown(0)){
+		if(Input.GetButtonDown("Attach")){
 			if(isAttached) Detach();
 			else Attach();
 		}
@@ -62,12 +64,15 @@ public class PlayerController : MonoBehaviour {
 		
 		isAttached = true;
 		attachmentIndicator.SetActive(true);
+		canAttachIndicator.SetActive(false);
 
 		StopCoroutine(currentRoutine);
 		
-		GetComponent<Collider>().enabled = false;
+		transform.rotation = Quaternion.LookRotation(GetNearestOrthogonalDir(), Vector3.up);
+		
+		playerCollider.enabled = false;
 		playerPhysics.isKinematic = true;
-		touchingBlock.gameObject.GetComponent<Collider>().enabled = false;
+		touchingBlock.blockCollider.enabled = false;
 		
 		currentRoutine = StartCoroutine(ProcessBlockMovement());	
 	}
@@ -78,11 +83,13 @@ public class PlayerController : MonoBehaviour {
 		
 		StopCoroutine(currentRoutine);
 		
-		GetComponent<Collider>().enabled = true;
+		playerCollider.enabled = true;
 		playerPhysics.isKinematic = false;
 
-		touchingBlock.gameObject.GetComponent<Collider>().enabled = true;
+		touchingBlock.blockCollider.enabled = true;
 		touchingBlock.blockPhysics.isKinematic = true;
+		
+		touchingBlock = null;
 		
 		currentRoutine = StartCoroutine(ProcessPlayerMovement());
 	}
@@ -106,6 +113,18 @@ public class PlayerController : MonoBehaviour {
 			Ray ray = new Ray(transform.position, input);
 			return !Physics.Raycast(ray, 0.7f);
 		}
+	}
+	
+	private Vector3 GetNearestOrthogonalDir(){
+		float dot = Vector3.Dot(transform.forward, Vector3.forward);
+		if(dot > 0.5f) return Vector3.forward;
+		else if (dot < -0.5f) return Vector3.back;
+		
+		dot = Vector3.Dot(transform.forward, Vector3.right);
+		if(dot >= 0.5f) return Vector3.right;
+		else if (dot <= -0.5f) return Vector3.left;
+		
+		return Vector3.up;
 	}
 	
 	private IEnumerator Move(Vector3 adjustment, float speed){
@@ -141,12 +160,14 @@ public class PlayerController : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider other){
 		if(other.transform.tag == "Block" && !isAttached){
-			touchingBlock = other.gameObject.GetComponent<Block>();
+			canAttachIndicator.SetActive(true);
+			touchingBlock = other.attachedRigidbody.GetComponent<Block>();
 		}
 	}
 	
 	void OnTriggerExit(Collider other){
 		if(other.transform.tag == "Block" && !isAttached){
+			canAttachIndicator.SetActive(false);
 			touchingBlock = null;
 		}
 	}
