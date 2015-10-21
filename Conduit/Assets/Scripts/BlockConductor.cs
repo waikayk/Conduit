@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BlockConnector : Block {
+public class BlockConductor : Block {
 }
