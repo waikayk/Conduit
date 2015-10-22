@@ -7,7 +7,7 @@ public class Block : MonoBehaviour {
 	public Collider blockCollider;
 	public Material onMat;
 	public Material offMat;
-	public bool isDamaged = false;
+	public bool isNonConductive = false;
 	
 	public Rigidbody blockPhysics{get; set;}
 	public Dictionary<int, Block> connectedBlocks{get;set;}
@@ -22,7 +22,7 @@ public class Block : MonoBehaviour {
 	}
 	
 	public void PulsePower(int sourceID, WaitForSeconds rate){
-		if(isPulsing || isDamaged) return;
+		if(isPulsing || isNonConductive) return;
 		StartCoroutine(Pulse(sourceID, rate));
 	}
 	

@@ -70,9 +70,9 @@ public class PlayerController : MonoBehaviour {
 		
 		transform.rotation = Quaternion.LookRotation(GetNearestOrthogonalDir(), Vector3.up);
 		
-		playerCollider.enabled = false;
+		//playerCollider.enabled = false;
 		playerPhysics.isKinematic = true;
-		touchingBlock.blockCollider.enabled = false;
+		//touchingBlock.blockCollider.enabled = false;
 		
 		currentRoutine = StartCoroutine(ProcessBlockMovement());	
 	}
@@ -83,10 +83,10 @@ public class PlayerController : MonoBehaviour {
 		
 		StopCoroutine(currentRoutine);
 		
-		playerCollider.enabled = true;
+		//playerCollider.enabled = true;
 		playerPhysics.isKinematic = false;
 
-		touchingBlock.blockCollider.enabled = true;
+		//touchingBlock.blockCollider.enabled = true;
 		touchingBlock.blockPhysics.isKinematic = true;
 		
 		touchingBlock = null;
