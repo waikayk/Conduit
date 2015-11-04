@@ -1,0 +1,15 @@
+https://s3.amazonaws.com/conduit.bluespirescity.com/index.html
+
+TODO list:
+
+- Moveable Dud Blocks
+- Immovable Conductor Blocks
+- Goal Block
+- Start Menu
+- Level Select
+- Level 0
+
+Questions:
+- Polarity?
+- T Splitters?
+- Re-think Clunky controls
