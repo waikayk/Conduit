@@ -1,15 +1,13 @@
 https://s3.amazonaws.com/conduit.bluespirescity.com/index.html
 
 TODO list:
-
-- Moveable Dud Blocks
-- Immovable Conductor Blocks
+- Moveable Dud Blocks - Done
+- Immovable Conductor Blocks - Done
 - Goal Block
 - Start Menu
 - Level Select
 - Level 0
 
 Questions:
-- Polarity?
-- T Splitters?
+- Polarity? A: 2 State Rotation
 - Re-think Clunky controls
