@@ -21,22 +21,28 @@ public class Block : MonoBehaviour {
 		renderComponent.material = offMat;
 	}
 	
-	public void PulsePower(int sourceID, WaitForSeconds rate){
+	public virtual void PulsePower(int sourceID, WaitForSeconds rate){
 		if(isPulsing || isNonConductive) return;
 		StartCoroutine(Pulse(sourceID, rate));
 	}
 	
 	private IEnumerator Pulse(int sourceID, WaitForSeconds rate){
 		isPulsing = true;
+		//yield return rate;
+//		foreach(KeyValuePair<int, Block> element in connectedBlocks){
+//			//make sure to skip the source to prevent stack overflow
+//			if(element.Key == sourceID) continue;
+//			element.Value.PulsePower(gameObject.GetInstanceID(), rate);
+//		}
+		
+		renderComponent.material = onMat;
 		yield return rate;
+		
 		foreach(KeyValuePair<int, Block> element in connectedBlocks){
 			//make sure to skip the source to prevent stack overflow
 			if(element.Key == sourceID) continue;
 			element.Value.PulsePower(gameObject.GetInstanceID(), rate);
 		}
-		
-		renderComponent.material = onMat;
-		yield return rate;
 		
 		renderComponent.material = offMat;
 		yield return rate;

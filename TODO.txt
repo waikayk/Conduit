@@ -3,11 +3,16 @@ https://s3.amazonaws.com/conduit.bluespirescity.com/index.html
 TODO list:
 - Moveable Dud Blocks - Done
 - Immovable Conductor Blocks - Done
-- Goal Block
+- Floor Panel - Done
+- Straighten Out the Conductor Lines - Done
+- Goal Block - Done-ish
+
+- World Singleton
+- Polarity Two State Rotation
+
 - Start Menu
 - Level Select
 - Level 0
 
 Questions:
-- Polarity? A: 2 State Rotation
 - Re-think Clunky controls
