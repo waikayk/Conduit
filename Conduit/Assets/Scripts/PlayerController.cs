@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour {
 		attachmentIndicator.SetActive(false);
 		canAttachIndicator.SetActive(false);
 		
-		//currentRoutine = StartCoroutine(ProcessPlayerMovement());
+		currentRoutine = StartCoroutine(ProcessPlayerMovement());
 	}
 	
 	void Update(){
@@ -28,20 +28,19 @@ public class PlayerController : MonoBehaviour {
 			if(isAttached) Detach();
 			else Attach();
 		}
-
-		if(!isAttached){
-			ProcessPlayerMovement();
-		}
 	}
 	
-	void ProcessPlayerMovement(){
+	IEnumerator ProcessPlayerMovement(){
 		//Tried making this a co-routine but none of the Waiting options will be as smooth as Update()
+		while(true){
 		Vector3 inputAxis = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
 		bool isShifted = Input.GetButton("Boost");
 		
 		if(inputAxis != Vector3.zero){
 			transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(inputAxis, Vector3.up), 15f);
 			playerPhysics.Move(inputAxis * (isShifted ? fastSpeed : normalSpeed) * Time.deltaTime + Vector3.down);
+		}
+			yield return null;
 		}
 	}
 	
@@ -69,7 +68,7 @@ public class PlayerController : MonoBehaviour {
 		attachmentIndicator.SetActive(true);
 		canAttachIndicator.SetActive(false);
 
-		//StopCoroutine(currentRoutine);
+		StopCoroutine(currentRoutine);
 		
 		transform.rotation = Quaternion.LookRotation(GetNearestOrthogonalDir(), Vector3.up);
 		
@@ -86,7 +85,7 @@ public class PlayerController : MonoBehaviour {
 		
 		touchingBlock = null;
 		
-		//currentRoutine = StartCoroutine(ProcessPlayerMovement());
+		currentRoutine = StartCoroutine(ProcessPlayerMovement());
 	}
 	
 	private bool CanMoveInDirection(Vector3 input){
@@ -130,7 +129,7 @@ public class PlayerController : MonoBehaviour {
 			transform.position = (
 				Vector3.Lerp(moveFrom, moveTo, t)
 			);
-			yield return new WaitForEndOfFrame();
+			yield return null;
 			t += Time.deltaTime * speed/2f;
 		}
 		transform.position = (moveTo);
