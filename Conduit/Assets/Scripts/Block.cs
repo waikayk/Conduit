@@ -55,12 +55,12 @@ public class Block : MonoBehaviour {
 		Vector3 moveTo = transform.position + adjustment;
 		moveTo = new Vector3(Mathf.Round(moveTo.x), moveTo.y, Mathf.Round(moveTo.z));
 		while(t < 1f){
-			blockPhysics.MovePosition(
+			transform.position = (
 				Vector3.Lerp(moveFrom, moveTo, t)
 			);
 			yield return new WaitForEndOfFrame();
 			t += Time.deltaTime * speed/2f;
 		}
-		blockPhysics.MovePosition(moveTo);
+		transform.position = (moveTo);
 	}
 }
