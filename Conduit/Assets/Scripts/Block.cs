@@ -8,10 +8,13 @@ public class Block : MonoBehaviour {
 	public Material onMat;
 	public Material offMat;
 	public bool isNonConductive = false;
+	public bool hasPolarity = true;
 	
 	public Rigidbody blockPhysics{get; set;}
 	public Dictionary<int, Block> connectedBlocks{get;set;}
 	public bool isPulsing {get;set;}
+
+	private bool isFlipped = false;
 	
 	public virtual void Start(){
 		connectedBlocks = new Dictionary<int, Block>();
@@ -62,5 +65,18 @@ public class Block : MonoBehaviour {
 			t += Time.deltaTime * speed/2f;
 		}
 		transform.position = (moveTo);
+	}
+
+	public void FlipPolarity(){
+		if(!hasPolarity) return;
+
+		if(!isFlipped){
+			transform.eulerAngles += new Vector3(0, 90f, 0);
+		}
+		else{
+			transform.eulerAngles -= new Vector3(0, 90f, 0);
+		}
+
+		isFlipped = !isFlipped;
 	}
 }

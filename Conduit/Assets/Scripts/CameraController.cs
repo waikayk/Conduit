@@ -10,7 +10,14 @@ public class CameraController : MonoBehaviour {
 	public Transform followThis;
 	public float smoothTime = 0.3f;
     private Vector3 velocity = Vector3.zero;
-	
+
+	private bool isZoomedOut = false;
+	private Coroutine routine;
+
+	void Awake(){
+		World.instance.cameraControl = this;
+	}
+
 	void Start(){
 		//Clamp to min/max
 		Zoom(0);
@@ -28,9 +35,14 @@ public class CameraController : MonoBehaviour {
 	}
 	
 	void ProcessInput(){
-		float mouseWheel = Input.GetAxis("Mouse ScrollWheel");
-		if(mouseWheel != 0){
-			Zoom(mouseWheel);
+//		float mouseWheel = Input.GetAxis("Mouse ScrollWheel");
+//		if(mouseWheel != 0){
+//			Zoom(mouseWheel);
+//		}
+		if(Input.GetButtonDown("Zoom")){
+			if(routine != null) StopCoroutine(routine);
+			routine = StartCoroutine(ZoomTo(isZoomedOut ? zoomMin : zoomMax));
+			isZoomedOut = !isZoomedOut;
 		}
 	}
 	
@@ -38,5 +50,15 @@ public class CameraController : MonoBehaviour {
 		float zoomHeight = camObject.transform.localPosition.y - (input * zoomSensitivity);
 		zoomHeight = Mathf.Clamp(zoomHeight, zoomMin, zoomMax);
 		camObject.transform.localPosition = new Vector3(0, zoomHeight, 0);
+	}
+
+	IEnumerator ZoomTo(float height, float duration = 0.5f){
+		Vector3 zoomFrom = camObject.transform.localPosition;
+		Vector3 zoomTo = new Vector3(0, Mathf.Clamp(height, zoomMin, zoomMax), 0);
+		for(float t = 0; t <= 1f; t += Time.deltaTime/duration){
+			camObject.transform.localPosition = Vector3.Lerp(zoomFrom, zoomTo, t);
+			yield return null;
+		}
+		camObject.transform.localPosition = zoomTo;
 	}
 }

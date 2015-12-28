@@ -1,18 +1,8 @@
 https://s3.amazonaws.com/conduit.bluespirescity.com/index.html
 
 TODO list:
-- Moveable Dud Blocks - Done
-- Immovable Conductor Blocks - Done
-- Floor Panel - Done
-- Straighten Out the Conductor Lines - Done
-- Goal Block - Done-ish
-
-- World Singleton
-- Polarity Two State Rotation
+- Random Code Generator -> Saved to PlayerPrefs
 
 - Start Menu
 - Level Select
 - Level 0
-
-Questions:
-- Re-think Clunky controls

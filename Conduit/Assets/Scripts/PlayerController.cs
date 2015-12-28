@@ -14,8 +14,12 @@ public class PlayerController : MonoBehaviour {
 	[HideInInspector]
 	public bool isAttached = false;
 	public Block touchingBlock{get;set;}
-	
-	void Start () {
+
+	void Awake(){
+		World.instance.playerControl = this;
+	}
+
+	void Start(){
 		playerPhysics = GetComponent<CharacterController>();
 		attachmentIndicator.SetActive(false);
 		canAttachIndicator.SetActive(false);
@@ -27,6 +31,9 @@ public class PlayerController : MonoBehaviour {
 		if(Input.GetButtonDown("Attach")){
 			if(isAttached) Detach();
 			else Attach();
+		}
+		else if(Input.GetButtonDown("Flip") && touchingBlock != null){
+			touchingBlock.FlipPolarity();
 		}
 	}
 	
@@ -78,12 +85,11 @@ public class PlayerController : MonoBehaviour {
 	public void Detach(){
 		isAttached = false;
 		attachmentIndicator.SetActive(false);
+		canAttachIndicator.SetActive(true);
 		
 		StopCoroutine(currentRoutine);
 
 		touchingBlock.blockPhysics.isKinematic = true;
-		
-		touchingBlock = null;
 		
 		currentRoutine = StartCoroutine(ProcessPlayerMovement());
 	}
