@@ -106,12 +106,12 @@ public class PlayerController : MonoBehaviour {
 		if(Mathf.Sign(dot) > 0){
 			//Forward
 			Ray ray = new Ray(touchingBlock.transform.position, input);
-			return !Physics.Raycast(ray, 1.25f);
+			return !Physics.Raycast(ray, 1.99f);
 		}
 		else {
 			//Back
 			Ray ray = new Ray(transform.position, input);
-			return !Physics.Raycast(ray, 0.7f);
+			return !Physics.Raycast(ray, 1.49f);
 		}
 	}
 	
