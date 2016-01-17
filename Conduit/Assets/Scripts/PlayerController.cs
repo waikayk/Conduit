@@ -102,18 +102,34 @@ public class PlayerController : MonoBehaviour {
 		//Direction Check: Does it lie on the same axis as forward?
 		if(Mathf.Abs(dot) < 0.99f) return false;
 		
-		//Racycast Check: Is there room in front or behind?
-		
+		//Racycast Check: Is there room in front or behind? Check in fork formation, in case of "tunnels"
+		Ray ray;
+		Vector3 orthoDir;
 		if(Mathf.Sign(dot) > 0){
-			//Forward
-			Ray ray = new Ray(touchingBlock.transform.position, input);
-			return !Physics.Raycast(ray, 1.99f);
+			//Forward, center prong
+			ray = new Ray(touchingBlock.transform.position, input);
+			if(Physics.Raycast(ray, 1.99f)) return false;
 		}
 		else {
-			//Back
-			Ray ray = new Ray(transform.position, input);
-			return !Physics.Raycast(ray, 1.49f);
+			//Back, center prong
+			ray = new Ray(transform.position, input);
+			if(Physics.Raycast(ray, 1.49f)) return false;
+			//Side prongs specifically for the player
+			orthoDir = GetNearestOrthogonalDir(transform.forward);
+			ray = new Ray(transform.position + GetSideProng(orthoDir, 1f, 0.5f), input);
+			if(Physics.Raycast(ray, 1.49f)) return false;
+			ray = new Ray(transform.position + GetSideProng(orthoDir, -1f, 0.5f), input);
+			if(Physics.Raycast(ray, 1.49f)) return false;
 		}
+		
+		//Side prings for the block
+		orthoDir = GetNearestOrthogonalDir(transform.forward);
+		ray = new Ray(touchingBlock.transform.position + GetSideProng(orthoDir, 1f, 0.75f), input);
+		if(Physics.Raycast(ray, 1.99f)) return false;
+		ray = new Ray(touchingBlock.transform.position + GetSideProng(orthoDir, -1f, 0.75f), input);
+		if(Physics.Raycast(ray, 1.99f)) return false;
+		
+		return true;
 	}
 	
 	private Vector3 GetNearestOrthogonalDir(Vector3 dir){
@@ -126,6 +142,19 @@ public class PlayerController : MonoBehaviour {
 		else if (dot <= -0.5f) return Vector3.left;
 		
 		return Vector3.up;
+	}
+	
+	private Vector3 GetSideProng(Vector3 axis, float sign, float magnitude = 1f){
+		if(axis == Vector3.forward || axis == Vector3.back){
+			return Vector3.right * sign * magnitude;
+		}
+		else if(axis == Vector3.right || axis == Vector3.left){
+			return Vector3.forward * sign * magnitude;
+		}
+		else{
+			Debug.LogError("Axis was not in an orthogonal direction.");
+			return Vector3.zero;
+		}
 	}
 	
 	private IEnumerator Nudge(Vector3 adjustment, float speed){
