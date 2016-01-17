@@ -59,6 +59,7 @@ public class PlayerController : MonoBehaviour {
 			bool isShifted = Input.GetButton("Boost");
 			
 			if(inputAxis != Vector3.zero && CanMoveInDirection(inputAxis)){
+				inputAxis = GetNearestOrthogonalDir(inputAxis);
 				StartCoroutine(Nudge(inputAxis, isShifted ? fastSpeed : normalSpeed));
 				yield return StartCoroutine(
 					touchingBlock.Move(inputAxis, isShifted? fastSpeed : normalSpeed)
@@ -77,7 +78,7 @@ public class PlayerController : MonoBehaviour {
 
 		StopCoroutine(currentRoutine);
 		
-		transform.rotation = Quaternion.LookRotation(GetNearestOrthogonalDir(), Vector3.up);
+		transform.rotation = Quaternion.LookRotation(GetNearestOrthogonalDir(transform.forward), Vector3.up);
 		
 		currentRoutine = StartCoroutine(ProcessBlockMovement());	
 	}
@@ -115,12 +116,12 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 	
-	private Vector3 GetNearestOrthogonalDir(){
-		float dot = Vector3.Dot(transform.forward, Vector3.forward);
+	private Vector3 GetNearestOrthogonalDir(Vector3 dir){
+		float dot = Vector3.Dot(dir, Vector3.forward);
 		if(dot > 0.5f) return Vector3.forward;
 		else if (dot < -0.5f) return Vector3.back;
 		
-		dot = Vector3.Dot(transform.forward, Vector3.right);
+		dot = Vector3.Dot(dir, Vector3.right);
 		if(dot >= 0.5f) return Vector3.right;
 		else if (dot <= -0.5f) return Vector3.left;
 		
