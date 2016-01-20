@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class BlockGoal : Block {
@@ -25,6 +26,6 @@ public class BlockGoal : Block {
 	
 	IEnumerator DelayedLoadLevel(){
 		yield return new WaitForSeconds(0.5f);
-		Application.LoadLevel(loadLevel);
+		SceneManager.LoadScene(loadLevel);
 	}
 }
