@@ -11,7 +11,7 @@ public class CameraController : MonoBehaviour {
 	public float smoothTime = 0.3f;
     private Vector3 velocity = Vector3.zero;
 
-	private bool isZoomedOut = false;
+	private bool isZoomedOut = true;
 	private Coroutine routine;
 
 	void Awake(){
@@ -20,7 +20,9 @@ public class CameraController : MonoBehaviour {
 
 	void Start(){
 		//Clamp to min/max
-		Zoom(0);
+		InstantZoom(0);
+		//Zoom Toggle, for effect
+		ZoomToggle();
 	}
 	
 	void Update(){
@@ -40,16 +42,20 @@ public class CameraController : MonoBehaviour {
 //			Zoom(mouseWheel);
 //		}
 		if(Input.GetButtonDown("Zoom")){
-			if(routine != null) StopCoroutine(routine);
-			routine = StartCoroutine(ZoomTo(isZoomedOut ? zoomMin : zoomMax));
-			isZoomedOut = !isZoomedOut;
+			ZoomToggle();
 		}
 	}
 	
-	void Zoom(float input){
+	void InstantZoom(float input){
 		float zoomHeight = camObject.transform.localPosition.y - (input * zoomSensitivity);
 		zoomHeight = Mathf.Clamp(zoomHeight, zoomMin, zoomMax);
 		camObject.transform.localPosition = new Vector3(0, zoomHeight, 0);
+	}
+	
+	void ZoomToggle(){
+		if(routine != null) StopCoroutine(routine);
+		routine = StartCoroutine(ZoomTo(isZoomedOut ? zoomMin : zoomMax));
+		isZoomedOut = !isZoomedOut;
 	}
 
 	IEnumerator ZoomTo(float height, float duration = 0.5f){

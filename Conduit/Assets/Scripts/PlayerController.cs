@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	IEnumerator ProcessPlayerMovement(){
-		//Tried making this a co-routine but none of the Waiting options will be as smooth as Update()
+
 		while(true){
 		Vector3 inputAxis = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
 		bool isShifted = Input.GetButton("Boost");

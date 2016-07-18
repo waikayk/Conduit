@@ -24,12 +24,12 @@ public class Block : MonoBehaviour {
 		renderComponent.material = offMat;
 	}
 	
-	public virtual void PulsePower(int sourceID, WaitForSeconds rate){
+	public virtual void PulsePower(int sourceID, WaitForSeconds delay){
 		if(isPulsing || isNonConductive) return;
-		StartCoroutine(Pulse(sourceID, rate));
+		StartCoroutine(Pulse(sourceID, delay));
 	}
 	
-	private IEnumerator Pulse(int sourceID, WaitForSeconds rate){
+	private IEnumerator Pulse(int sourceID, WaitForSeconds delay){
 		isPulsing = true;
 		//yield return rate;
 //		foreach(KeyValuePair<int, Block> element in connectedBlocks){
@@ -39,16 +39,16 @@ public class Block : MonoBehaviour {
 //		}
 		
 		renderComponent.material = onMat;
-		yield return rate;
+		yield return delay;
 		
 		foreach(KeyValuePair<int, Block> element in connectedBlocks){
 			//make sure to skip the source to prevent stack overflow
 			if(element.Key == sourceID) continue;
-			element.Value.PulsePower(gameObject.GetInstanceID(), rate);
+			element.Value.PulsePower(gameObject.GetInstanceID(), delay);
 		}
 		
 		renderComponent.material = offMat;
-		yield return rate;
+		yield return delay;
 		isPulsing = false;
 	}
 	
